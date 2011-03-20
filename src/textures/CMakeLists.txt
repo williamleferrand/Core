@@ -2,7 +2,7 @@ include_directories(${YAF_INCLUDE_DIRS})
 
 add_definitions(-DBUILDING_YAFRAYPLUGIN)
 
-set(basictex_SRCS basictex.cc noise.cc imagetex.cc)
+set(basictex_SRCS basictex.cc noise.cc getobject.c imagetex.cc)
 add_library(basictex SHARED ${basictex_SRCS})
 target_link_libraries(basictex yafaraycore)
 

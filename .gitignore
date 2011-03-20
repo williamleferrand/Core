@@ -1,0 +1,10 @@
+legacy
+CMakeFiles*
+CMakeCache.txt
+Makefile
+*.cmake
+yaf_revision.h
+yafray_config.h
+*~
+*.dylib
+yafaray-xml

@@ -23,6 +23,55 @@
 #include <cctype>
 #include <textures/imagetex.h>
 #include <utilities/stringUtils.h>
+#include <sys/stat.h>
+
+extern "C" {
+int get_object(const char* bucketName, const char* key, const char* filename) ;
+}
+
+std::string universal_basename (std::string &filename) {
+  const char* cstr = filename.c_str () ; 
+  int len = filename.length () ; 
+  
+  const char *it = cstr + (len * sizeof (char)) ; 
+  while (it > cstr && *it != '\\' && *it != '/') (it = it - sizeof (char)); 
+  
+  
+  if ((*it == '\\' || *it == '/') && it != cstr + len) return (std::string (it + sizeof (char))); 
+  return (std::string (it)); 
+    
+};
+
+std::string local_path_of_key (std::string &key) {
+  std::string bname = universal_basename (key) ;
+  std::string tmp = "/mnt/temporary/" ; 
+  tmp.append(bname); 
+  return tmp; 
+}
+
+bool FileExists(std::string strFilename) { 
+  struct stat stFileInfo; 
+  bool blnReturn; 
+  int intStat; 
+
+  // Attempt to get the file attributes 
+  intStat = stat(strFilename.c_str(),&stFileInfo); 
+  if(intStat == 0) { 
+    // We were able to get the file attributes 
+    // so the file obviously exists. 
+    blnReturn = true; 
+  } else { 
+    // We were not able to get the file attributes. 
+    // This may mean that we don't have permission to 
+    // access the folder which contains this file. If you 
+    // need to do that level of checking, lookup the 
+    // return values of stat which will give you 
+    // more details on why stat failed. 
+    blnReturn = false; 
+  } 
+   
+  return(blnReturn); 
+}
 
 __BEGIN_YAFRAY
 
@@ -254,6 +303,23 @@ int string2cliptype(const std::string *clipname)
 	return tex_clipmode;
 }
 
+std::string urlDecode(std::string &SRC) {
+  std::string ret;
+    char ch;
+    int i, ii;
+    for (i=0; i<SRC.length(); i++) {
+        if (int(SRC[i])==37) {
+            sscanf(SRC.substr(i+1,2).c_str(), "%x", &ii);
+            ch=static_cast<char>(ii);
+            ret+=ch;
+            i=i+2;
+        } else {
+            ret+=SRC[i];
+        }
+    }
+    return (ret);
+}
+
 texture_t *textureImage_t::factory(paraMap_t &params, renderEnvironment_t &render)
 {
 	const std::string *name = NULL;
@@ -274,6 +340,15 @@ texture_t *textureImage_t::factory(paraMap_t &params, renderEnvironment_t &rende
 		Y_ERROR << "ImageTexture: Required argument filename not found for image texture" << yendl;
 		return NULL;
 	}
+
+	std::string key = std::string (*name);
+        std::string escaped_key = urlDecode (key);
+        std::string local_path = local_path_of_key (key);
+
+        if (!FileExists (local_path)) {
+          get_object ("corefarm-data", escaped_key.c_str (), local_path.c_str ()) ;
+        }
+
 	
 	// interpolation type, bilinear default
 	interpolationType intp = INTP_BILINEAR;
@@ -284,8 +359,8 @@ texture_t *textureImage_t::factory(paraMap_t &params, renderEnvironment_t &rende
 		else if (*intpstr == "bicubic") intp = INTP_BICUBIC;
 	}
 	
-	size_t lDot = name->rfind(".") + 1;
-	size_t lSlash = name->rfind("/") + 1;
+	size_t lDot = local_path.rfind(".") + 1;
+	size_t lSlash = local_path.rfind("/") + 1;
 	
 	std::string ext = toLower(name->substr(lDot));
 	
@@ -311,7 +386,7 @@ texture_t *textureImage_t::factory(paraMap_t &params, renderEnvironment_t &rende
 		return NULL;
 	}
 	
-	if(!ih->loadFromFile(*name))
+	if(!ih->loadFromFile(local_path))
 	{
 		Y_ERROR << "ImageTexture: Couldn't load image file, dropping texture." << yendl;
 		return NULL;

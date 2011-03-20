@@ -85,7 +85,16 @@ class YAFRAYCORE_EXPORT paraMap_t
 			if(i != dicc.end() ) return i->second.getVal(val);
 			return false;
 		}
-		
+		template <class T> bool updateParam(const std::string &name, T &val)
+		  {
+		    parameter_t np (val) ;
+		    
+		    std::map<std::string,parameter_t>::iterator i=dicc.find(name);
+		    if(i != dicc.end() ) dicc.erase (i);
+		    
+		    dicc.insert ( std::pair<std::string, parameter_t>(name, np) );
+		    return true;
+		  }
 		bool getMatrix(const std::string &name, matrix4x4_t &m) const
 		{
 			std::map<std::string,matrix4x4_t>::const_iterator i=mdicc.find(name);

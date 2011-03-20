@@ -71,6 +71,12 @@ int main(int argc, char *argv[])
 
 	parse.setOption("v","version", true, "Displays this program's version.");
 	parse.setOption("h","help", true, "Displays this help text.");
+	// --- Adds for corefarm
+	parse.setOption("bx","xstart", false, "border rendering, xstart");
+	parse.setOption("by","ystart", false, "border rendering ystart");
+	parse.setOption("he","height", false, "border rendering height");
+	parse.setOption("we","width", false, "border rendering width");
+	// --- Ends adds
 	parse.setOption("op","output-path", false, "Uses the path in <value> as rendered image output path.");
 	parse.setOption("f","format", false, "Sets the output image format, available formats are:\n\n" + formatString + "\n                                       Default: tga.\n");
 	parse.setOption("t","threads", false, "Overrides threads setting on the XML file, for auto selection use -1.");
@@ -112,6 +118,11 @@ int main(int argc, char *argv[])
 	bool zbuf = parse.getFlag("z");
 	bool nozbuf = parse.getFlag("nz");
 	
+	int bx = parse.getOptionInteger ("bx"); 
+	int by = parse.getOptionInteger ("by"); 
+	int height = parse.getOptionInteger ("he"); 
+	int width = parse.getOptionInteger ("we"); 
+
 	if(format.empty()) format = "tga";
 	bool formatValid = false;
 	
@@ -161,23 +172,18 @@ int main(int argc, char *argv[])
 	
 	bool success = parse_xml_file(xmlFile.c_str(), scene, env, render);
 	if(!success) exit(1);
-	
-	int width=320, height=240;
-	int bx = 0, by = 0;
-	render.getParam("width", width); // width of rendered image
-	render.getParam("height", height); // height of rendered image
-	render.getParam("xstart", bx); // border render x start
-	render.getParam("ystart", by); // border render y start
-	
+
+
+	int tile_size = 32 ; 
+	render.updateParam("width", width); 
+	render.updateParam("height", height) ;
+	render.updateParam("xstart", bx) ;
+	render.updateParam("ystart", by) ; 
+	render.updateParam("tile_size", tile_size) ; 
+		
 	if(threads >= -1) render["threads"] = threads;
-	
-	if(drawparams)
-	{
-		render["drawParams"] = true;
-		if(!customString.empty()) render["customString"] = customString;
-	}
-	
-	if(nodrawparams) render["drawParams"] = false;
+		
+	render["drawParams"] = false;
 	
 	if(zbuf) render["z_channel"] = true;
 	if(nozbuf) render["z_channel"] = false;
@@ -204,7 +210,7 @@ int main(int argc, char *argv[])
 	}
 	else return 1;
 	
-	if(! env->setupScene(*scene, render, *out) ) return 1;
+	if(! env->setupScene(*scene, render, *out, 0) ) return 1;
 	
 	scene->render();
 	env->clearAll();
