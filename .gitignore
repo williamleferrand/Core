@@ -8,3 +8,4 @@ yafray_config.h
 *~
 *.dylib
 yafaray-xml
+*#*

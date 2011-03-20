@@ -61,6 +61,7 @@ pathIntegrator_t::pathIntegrator_t(bool transpShad, int shadowDepth)
 	maxBounces = 5;
 	nPaths = 64;
 	invNPaths = 1.f/64.f;
+	intpb = 0 ; 
 	no_recursive = false;
 	integratorName = "PathTracer";
 	integratorShortName = "PT";

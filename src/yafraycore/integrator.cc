@@ -133,6 +133,7 @@ bool tiledIntegrator_t::render(imageFilm_t *image)
 	Y_INFO << integratorName << ": Max. " << AA_samples + std::max(0,AA_passes-1) * AA_inc_samples << " total samples" << yendl;
 	passString << "Rendering pass 1 of " << std::max(1, AA_passes) << "...";
 	Y_INFO << integratorName << ": " << passString.str() << yendl;
+	Y_INFO << "intpb: " << intpb << yendl ; 
 	if(intpb) intpb->setTag(passString.str().c_str());
 
 	gTimer.addEvent("rendert");
