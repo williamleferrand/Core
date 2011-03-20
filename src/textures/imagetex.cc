@@ -362,7 +362,7 @@ texture_t *textureImage_t::factory(paraMap_t &params, renderEnvironment_t &rende
 	size_t lDot = local_path.rfind(".") + 1;
 	size_t lSlash = local_path.rfind("/") + 1;
 	
-	std::string ext = toLower(name->substr(lDot));
+	std::string ext = toLower(local_path.substr(lDot));
 	
 	std::string fmt = render.getImageFormatFromExtension(ext);
 	
