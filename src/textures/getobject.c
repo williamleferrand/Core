@@ -1,11 +1,11 @@
 // S3 putobject 
 
 #ifndef AWS_ACCESS_KEY
-#define AWS_ACCESS_KEY "AKIAJKPUWEUDFVKSUQFA"
+#define AWS_ACCESS_KEY "AKIA..."
 #endif
 
 #ifndef AWS_SECRET
-#define AWS_SECRET "5mUg1Xdz7x8CsRgLSCnac65fngVzQzFd+3kFZrIr"
+#define AWS_SECRET "5mU..."
 #endif
 
 #include <ctype.h>
