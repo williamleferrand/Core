@@ -44,9 +44,9 @@ bool imageOutput_t::putPixel(int x, int y, const float *c, bool alpha, bool dept
 {
 	if(image)
 	{
-		colorA_t col(0.f); 
+		colorA_t col(0.f);
 		col.set(c[0], c[1], c[2], ( (alpha) ? c[3] : 1.f ) );
-		image->putPixel(x + bX , y + bY, col, z);
+		image->putPixel(x, y, col, z);
 	}
 	return true;
 }
